@@ -1,18 +1,18 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import userRouter from "./routes/userRoute/userRoute.js";
-import postRouter from "./routes/blogRoute/postsRoute.js";
-import categoryRoute from "./routes/blogRoute/categoriesRoute.js";
-import volunteeRouter from "./routes/volunteeRoute/volunteeRoute.js";
-import sponsorRouter from "./routes/sponsorRoute/sponsorRoute.js";
-import projectRouter from "./routes/projectRoute/projectRoute.js";
-import galleryRouter from "./routes/galleryRoute/galleryRoute.js";
 import fileupload from "express-fileupload";
 import cors from "cors";
-import teamRoute from "./Routes/teamRoute/team.js";
-import eventRouter from "./Routes/eventRoute/eventRoute.js";
 import Authrouter from "./routes/userRoute/auth.js";
+import eventRouter from "./Routes/eventRoute/eventRoute.js";
+import projectRouter from "./routes/projectRoute/projectRoute.js";
+import sponsorRouter from "./Routes/sponsorRoute/sponsorRoute.js";
+import volunteeRouter from "./Routes/volunteeRoute/volunteeRoute.js";
+import teamRoute from "./Routes/teamRoute/team.js";
+import postRouter from "./Routes/blogRoute/postsRoute.js";
+import categoryRoute from "./Routes/blogRoute/categoriesRoute.js";
+import userRouter from "./Routes/userRoute/userRoute.js";
+import galleryRouter from "./routes/galleryRoute/galleryRoute.js";
 
 dotenv.config();
 
