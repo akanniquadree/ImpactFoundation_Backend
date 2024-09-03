@@ -1,5 +1,5 @@
 const express = require("express");
-const VolunteeModel = require("../../Model/volunteeModel/VolunteeModel.js");
+const VolunteeModel = require("../../Model/VolunteeModel/VolunteeModel.js");
 
 const volunteeRouter = express.Router();
 
