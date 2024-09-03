@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Event = require("../../Model/EventModel/eventModel.js");
+const Event = require("../../Model/EventModel/EventModel.js");
 dotenv.config();
 
 const eventRouter = express.Router();

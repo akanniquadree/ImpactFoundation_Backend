@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Project = require("../../model/ProjectModel/projectModel.js");
+const Project = require("../../Model/ProjectModel/ProjectModel.js");
 
 const projectRouter = express.Router();
 dotenv.config();
