@@ -3,9 +3,9 @@ import User from "../../model/UserModel/User.js";
 import bcrypt from "bcrypt";
 import { getToken } from "../../util.js";
 
-const router = express.Router();
+const Authrouter = express.Router();
 
-router.post("/register", async (req, res) => {
+Authrouter.post("/register", async (req, res) => {
   try {
     const { username, name, email, password } = req.body;
     if (!username || !name || !email || !password) {
@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+Authrouter.post("/login", async (req, res) => {
   try {
     const { username } = req.body;
     if (!username) {
@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/createadmin", async (req, res) => {
+Authrouter.get("/createadmin", async (req, res) => {
   try {
     const user = new User({
       name: "TGIF",
@@ -79,4 +79,4 @@ router.get("/createadmin", async (req, res) => {
   }
 });
 
-export default router;
+export default Authrouter;
