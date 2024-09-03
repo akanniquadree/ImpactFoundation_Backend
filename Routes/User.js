@@ -1,10 +1,5 @@
-const express = require("express")
+const express = require("express");
 
+const userRouter = express.Router();
 
-const userRouter = express.Router()
-
-//Update User
-userRouter.put("/update", ())
-
-
-module.exports = userRouter
+module.exports = userRouter;

@@ -1,19 +1,24 @@
-import mongoose from "mongoose"
+const mongoose = require("mongoose");
 
-const volunteeSchema = new mongoose.Schema({
-    name: {type:String, required: true},
-    email: {type:String, required: true, unique: true, index:true, dropDups:true},
-    phone: {type:Number, required: true},
-    add: {type:String, required: true},
-    dob: {type: String, required: true},
-    occu:{type:String, required:false},
-    mess:{type:String, required:false},
+const volunteeSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      dropDups: true,
+    },
+    phone: { type: Number, required: true },
+    add: { type: String, required: true },
+    dob: { type: String, required: true },
+    occu: { type: String, required: false },
+    mess: { type: String, required: false },
+  },
+  { timestamps: true }
+);
 
-},
-{timestamps:true}
-)
+const VolunteeModel = mongoose.model("Voluntee", volunteeSchema);
 
-const VolunteeModel = mongoose.model("Voluntee", volunteeSchema)
-
-
-export default VolunteeModel;
+module.exports = VolunteeModel;

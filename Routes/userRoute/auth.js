@@ -1,7 +1,6 @@
-import express from "express";
-import User from "../../model/UserModel/User.js";
-import bcrypt from "bcrypt";
-import { getToken } from "../../util.js";
+const express = require("express");
+const bcrypt = require("bcrypt");
+const User = require("../../Model/UserModel/User");
 
 const Authrouter = express.Router();
 
@@ -79,4 +78,4 @@ Authrouter.get("/createadmin", async (req, res) => {
   }
 });
 
-export default Authrouter;
+module.exports = Authrouter;

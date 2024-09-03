@@ -1,7 +1,7 @@
-import express from "express";
-import Sponsor from "../../model/SponsorModel/sponsorModel.js";
-import dotenv from "dotenv";
-import cloudinary from "cloudinary";
+const express = require("express");
+const cloudinary = require("cloudinary");
+const dotenv = require("dotenv");
+const Sponsor = require("../../model/SponsorModel/sponsorModel");
 
 dotenv.config();
 cloudinary.config({
@@ -113,4 +113,4 @@ sponsorRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default sponsorRouter;
+module.exports = sponsorRouter;

@@ -1,7 +1,7 @@
-import express from "express";
-import Project from "../../model/ProjectModel/projectModel.js";
-import cloudinary from "cloudinary";
-import dotenv from "dotenv";
+const express = require("express");
+const cloudinary = require("cloudinary");
+const dotenv = require("dotenv");
+const Project = require("../../model/ProjectModel/projectModel");
 
 const projectRouter = express.Router();
 dotenv.config();
@@ -133,4 +133,4 @@ projectRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default projectRouter;
+module.exports = projectRouter;

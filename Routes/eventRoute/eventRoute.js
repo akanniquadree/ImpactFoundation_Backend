@@ -1,8 +1,7 @@
-import express from "express";
-import Event from "../../Model/EventModel/eventModel.js";
-import cloudinary from "cloudinary";
-import dotenv from "dotenv";
-
+const express = require("express");
+const cloudinary = require("cloudinary");
+const dotenv = require("dotenv");
+const Event = require("../../Model/EventModel/eventModel");
 dotenv.config();
 
 const eventRouter = express.Router();
@@ -167,4 +166,4 @@ eventRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default eventRouter;
+module.exports = eventRouter;

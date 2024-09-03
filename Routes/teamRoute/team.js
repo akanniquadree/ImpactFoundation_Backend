@@ -1,8 +1,7 @@
-import express from "express";
-import multer from "multer";
-import Team from "../../Model/TeamModel/teamModel.js";
-import cloudinary from "cloudinary";
-import dotenv from "dotenv";
+const express = require("express");
+const cloudinary = require("cloudinary");
+const dotenv = require("dotenv");
+const Team = require("../../Model/TeamModel/teamModel");
 
 const teamRoute = express.Router();
 dotenv.config();
@@ -120,4 +119,4 @@ teamRoute.delete("/:id", async (req, res) => {
   return res.status(400).send({ message: "Error in deleting Team member" });
 });
 
-export default teamRoute;
+module.exports = teamRoute;

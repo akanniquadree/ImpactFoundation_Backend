@@ -1,7 +1,7 @@
-import Gallery from "../../model/GalleryModel/galleryModel.js";
-import express from "express";
-import cloudinary from "cloudinary";
-import dotenv from "dotenv";
+const express = require("express");
+const cloudinary = require("cloudinary");
+const dotenv = require("dotenv");
+const Gallery = require("../../model/GalleryModel/galleryModel");
 
 dotenv.config();
 
@@ -74,4 +74,4 @@ galleryRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default galleryRouter;
+module.exports = galleryRouter;
