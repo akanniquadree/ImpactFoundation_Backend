@@ -1,79 +1,116 @@
-import express from "express"
-import Sponsor from "../../model/SponsorModel/sponsorModel.js"
-import multer from "multer"
+import express from "express";
+import Sponsor from "../../model/SponsorModel/sponsorModel.js";
+import dotenv from "dotenv";
+import cloudinary from "cloudinary";
 
-const storage = multer.diskStorage({
-    destination:  (req, file, callback) => {
-        callback(null, "./frontend/public/uploads/")
-    },
-    filename: (req, file, callback) => {
-        callback(null,  file.originalname)
+dotenv.config();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const sponsorRouter = express.Router();
+
+sponsorRouter.get("/", async (req, res) => {
+  const sponsor = await Sponsor.find({}).sort("-updateAt");
+  res.status(200).send(sponsor);
+});
+
+sponsorRouter.post("/", async (req, res) => {
+  try {
+    const { name, loc, desc } = req.body;
+    const image = req.files.image;
+    if (!name || !loc || !desc) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
-
-const upload = multer({
-    storage:storage
-})
-const sponsorRouter = express.Router()
-
-sponsorRouter.get("/", async(req, res)=>{
-    const sponsor = await Sponsor.find({})
-        res.status(200).send(sponsor)
-})
-
-sponsorRouter.post("/", upload.single("image"), async(req, res)=>{
-    try {
-       const getSponsor = new Sponsor({
-        image: req.file.originalname,
-        name: req.body.name,
-        loc: req.body.loc,
-        desc: req.body.desc
-    })
-    const newSponsor = await getSponsor.save() 
-    if(newSponsor){
-        res.status(200).send({message: "New Product Created", data: newSponsor})
+    const existTeam = await Sponsor.findOne({ name });
+    if (existTeam) {
+      return res
+        .status(422)
+        .json({ error: "Sponsor already exist in our record" });
     }
-    res.status(400).send({msg: "Fail to Create Sponsor"})
-    } catch (error) {
-        res.status(500).send({msg: error.msg})
+    const avatar_clod = await cloudinary.uploader.upload(
+      image.tempFilePath,
+      function (res) {},
+
+      {
+        folder: `TGIF/Sponsors/${name}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    const getSponsor = new Sponsor({
+      image: avatar_clod.url,
+      name,
+      loc,
+      desc,
+    });
+    const newSponsor = await getSponsor.save();
+    if (newSponsor) {
+      return res
+        .status(201)
+        .send({ message: "New Sponsor Created", newSponsor });
     }
-})
+    return res.status(400).send({ msg: "Fail to Create Sponsor" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
 
-sponsorRouter.put("/:id",upload.single("image"), async(req, res)=>{
-   
-    try { 
-        const sponsorId = req.params.id;
-        const getSponsor = await Sponsor.findById({_id:sponsorId})
-        if(getSponsor){
-            getSponspor.name = req.body.name;
-            getSponspor.image = req.file.originalname;
-            getSponspor.loc = req.body.loc;
-            getSponspor.desc = req.body.desc;
-
-            const saveSponsor = await getSponsor.save()
-            if (saveSponsor){
-                res.status(200).send(saveSponsor)
-            }
-            res.status(500).send({msg: 'Error in saving Sponsor'})
-        }
-        res.status(500).send({msg: 'Error in updating Sponsor'})
-    } catch (error) {
-        res.status(400).send({msg: error.msg})
+sponsorRouter.put("/:id", async (req, res) => {
+  try {
+    const { name, loc, desc } = req.body;
+    const image = req.files.image;
+    if (!name || !loc || !desc) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
-
-sponsorRouter.delete("/:id", async(req, res)=>{
-    try {
-        const getSponsor = await Sponsor.findById(req.body.id)
-        if(getSponsor){
-           await getSponsor.remove()
-            res.status(200).send({msg: "Sponsor Deleted"})
-        }
-        res.status(500).send({msg:"Error in deleting Sponsor"})
-    } catch (error) {
-        res.status(400).send({msg: error.msg})
+    const sponsorId = req.params.id;
+    const getSponsor = await Sponsor.findById({ _id: sponsorId });
+    if (!getSponsor) {
+      return res.status(422).json({ error: "Sponsor Name doesnt exist" });
     }
-})
+    const avatar_clod = await cloudinary.uploader.upload(
+      image.tempFilePath,
+      function (res) {},
+      {
+        folder: `TGIF/Sponsors/${name}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    if (getSponsor) {
+      getSponsor.name = name;
+      getSponsor.image = avatar_clod.url;
+      getSponsor.loc = loc;
+      getSponsor.desc = desc;
 
+      const saveSponsor = await getSponsor.save();
+      if (saveSponsor) {
+        return res.status(201).send(saveSponsor);
+      }
+      return res.status(500).send({ msg: "Error in saving Sponsor" });
+    }
+    return res.status(500).send({ error: "Error in updating Sponsor" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error });
+  }
+});
 
-export default sponsorRouter
+sponsorRouter.delete("/:id", async (req, res) => {
+  try {
+    const getSponsor = await Sponsor.findById(req.body.id);
+    if (getSponsor) {
+      await getSponsor.remove();
+      return res.status(200).send({ msg: "Sponsor Deleted" });
+    }
+    return res.status(422).send({ msg: "Error in deleting Sponsor" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
+
+export default sponsorRouter;

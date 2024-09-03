@@ -1,92 +1,123 @@
-import express from "express"
-import Team from "../../model/TeamModel/teamModel.js"
-import multer from "multer"
+import express from "express";
+import multer from "multer";
+import Team from "../../Model/TeamModel/teamModel.js";
+import cloudinary from "cloudinary";
+import dotenv from "dotenv";
 
-const teamRoute = express.Router()
+const teamRoute = express.Router();
+dotenv.config();
 
-const storage = multer.diskStorage({
-    destination: (req, file, callback) =>{
-        callback(null, "./frontend/public/uploads/");
-    },
-    filename:  (req, file, callback)=> {
-        callback(null, file.originalname);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+teamRoute.get("/", async (req, res) => {
+  const teams = await Team.find({}).sort("-updateAt");
+  return res.status(201).json(teams);
+});
+
+teamRoute.get("/:id", async (req, res) => {
+  const team = await Team.findById(req.body.id);
+  if (!team) {
+    return res.status(401).json({ error: "Error in retrieving Team" });
+  }
+  return res.status(201).json(team);
+});
+
+teamRoute.post("/", async (req, res) => {
+  try {
+    const { name, post, facebook, twitter, instagram } = req.body;
+    const articleImage = req.files.articleImage;
+    if (!name || !post) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
-// const fileFilter = (req, file, cb)=>{
-//     if(file.mimetype === "image/jpg" || "image/png"){
-//         cb(null, true)
-//     }else{
-//         cb(new Error("Can only upload jpg and png"), false)
-//     }
-// }
-const upload = multer({
-    storage:storage
-})
-
-
-
-teamRoute.get("/", async(req, res)=>{
-    const teams = await Team.find({})
-    res.send(teams)
-})
-
-teamRoute.get("/:id", async(req, res)=>{
-    const team = await Team.findById(req.body.id)
-    res.send(team)
-})
-
-teamRoute.post("/", upload.single("articleImage"), async(req, res)=>{
-    try{ 
-        const team = new Team({
-        name: req.body.name,
-        articleImage: req.file.originalname,
-        post: req.body.post,
-        facebook: req.body.facebook,
-        twitter: req.body.twitter,
-        instagram: req.body.instagram
-        })
-        const saveTeam = await team.save()
-        if(saveTeam){
-        return res.status(201).json({msg: "New Team member uploaded", data: saveTeam})
-        }
-        return res.status(500).json({message: "Error in creating team member"})
-    }catch(error){
-        res.status(400).send({message: error.message})
+    const existTeam = await Team.findOne({ name });
+    if (existTeam) {
+      return res
+        .status(422)
+        .json({ error: "Name already exist in our record" });
     }
-})
-
-
-teamRoute.put("/:id", async(req, res)=>{
-    try {
-        const TeamId = req.params.id;
-        const getTeam = await Team.findById({_id:TeamId})
-        if(getTeam){
-            getTeam.articleImage= req.file.originalname;
-            getTeam.name= req.body.name;
-            getTeam.post= req.body.post;
-            getTeam.facebook= req.body.facebook,
-            getTeam.twitter= req.body.twitter,
-            getTeam.instagram= req.body.instagram
-            const updatedTeam = await getTeam.save();
-            if(updatedTeam){
-                return res.status(200).send({message: "Team member Updated", data: updatedTeam})
-            }
+    const avatar_clod = await cloudinary.uploader.upload(
+      articleImage.tempFilePath,
+      function (res) {},
+      {
+        folder: `TGIF/Teams/${name}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    const team = new Team({
+      name,
+      articleImage: avatar_clod.url,
+      post,
+      facebook,
+      twitter,
+      instagram,
+    });
+    const saveTeam = await team.save();
+    if (saveTeam) {
+      return res
+        .status(201)
+        .json({ msg: "New Team member uploaded", saveTeam });
     }
-        return res.status(500).send({message: "Error in updating Team member"})
-    } catch (error) {
-        res.status(400).send({message: error.message})
+    return res.status(500).json({ message: "Error in creating team member" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
+
+teamRoute.put("/:id", async (req, res) => {
+  try {
+    const { name, post, facebook, twitter, instagram } = req.body;
+    const articleImage = req.files.articleImage;
+    if (!name || !post) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
-
-teamRoute.delete("/:id", async(req, res)=>{
-    const deleteTeam = await Team.findById(req.params.id)
-    if(deleteTeam){
-        await deleteTeam.remove()
-        res.send({message: "Product Deleted"})
+    const TeamId = req.params.id;
+    const getTeam = await Team.findById({ _id: TeamId });
+    if (!getTeam) {
+      return res.status(422).json({ error: "Team member doesnt exist" });
     }
-    res.status(400).send({message: "Error in deleting Team member"})
-})
+    const avatar_clod = await cloudinary.uploader.upload(
+      articleImage.tempFilePath,
+      function (res) {},
+      {
+        folder: `TGIF/Teams/${name}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    if (getTeam) {
+      getTeam.articleImage = avatar_clod.url;
+      getTeam.name = name;
+      getTeam.post = post;
+      (getTeam.facebook = facebook),
+        (getTeam.twitter = twitter),
+        (getTeam.instagram = instagram);
+      const updatedTeam = await getTeam.save();
+      if (updatedTeam) {
+        return res
+          .status(201)
+          .send({ message: "Team member Updated", data: updatedTeam });
+      }
+    }
+    return res.status(422).send({ message: "Error in updating Team member" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
 
-
+teamRoute.delete("/:id", async (req, res) => {
+  const deleteTeam = await Team.findById(req.params.id);
+  if (deleteTeam) {
+    await deleteTeam.remove();
+    return res.send({ message: "Product Deleted" });
+  }
+  return res.status(400).send({ message: "Error in deleting Team member" });
+});
 
 export default teamRoute;

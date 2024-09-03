@@ -1,100 +1,136 @@
-import express from "express"
+import express from "express";
 import Project from "../../model/ProjectModel/projectModel.js";
-import multer from "multer"
+import cloudinary from "cloudinary";
+import dotenv from "dotenv";
 
+const projectRouter = express.Router();
+dotenv.config();
 
-const projectRouter = express.Router()
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.diskStorage({
-    destination: (req, file, callback)=>{
-        callback(null, "./frontend/public/uploads/")
-    },
-    filename: (req, file, callback)=>{
-        callback (null, file.originalname)
+projectRouter.get("/", async (req, res) => {
+  const projects = await Project.find({}).sort("-updateAt");
+  return res.status(201).res.send(projects);
+});
+
+projectRouter.get("/:id", async (req, res) => {
+  const projectId = req.params.id;
+  try {
+    const project = await Project.findById({ _id: projectId });
+    if (project) {
+      return res.status(201).send(project);
+    } else {
+      return res.status(422).send({ msg: "Project does not exist" });
     }
-})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
 
-const upload = multer({
-    storage:storage
-})
-
-projectRouter.get("/", async(req, res)=>{
-    const projects = await Project.find({}).sort({createdAt: 'desc'})
-    res.send(projects)
-})
-
-
-projectRouter.get("/:id", async(req, res)=>{
-    const projectId = req.params.id
-    try {
-        const project = await Project.findById({_id:projectId})
-        if(project){
-            res.send(project)
-        }else{
-            res.status(401).send({msg: "Project does not exist"})
-        }
-    } catch (error) {
-        res.status(500).send({msg: error.msg})
+projectRouter.post("/", async (req, res) => {
+  try {
+    const { heading, goal, raised, desc } = req.body;
+    const image = req.files.image;
+    if (!heading || !image || !desc) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
-
-projectRouter.post("/", upload.single('image'), async(req, res)=>{
-    try {
-        const newProject = new Project({
-            image: req.file.originalname,
-            heading: req.body.heading,
-            desc: req.body.desc,
-            goal: req.body.goal,
-            raised: req.body.raised
-        })
-        const savedProject = await newProject.save()
-        if(savedProject){
-            res.status(200).send(savedProject)
-        }else{
-            res.send(401).send({msg: "Error in saving Project"})
-        }
-    } catch (error) {
-        res.status(500).send({msg: error.msg})
+    const existTeam = await Project.findOne({ heading });
+    if (existTeam) {
+      return res
+        .status(422)
+        .json({ error: "Project already exist in our record" });
     }
-})
-
-projectRouter.put("/:id", async(req, res)=>{
-    try {
-        const getProject = await Project.findById(req.params.id)
-        if(getProject){
-            getProject.image = req.body.image
-            getProject.heading = req.body.heading
-            getProject.desc = req.body.desc
-            getProject.goal = req.body.goal
-            getProject.raised = req.body.raised
-
-            const saveProjects = await getProject.save() 
-            if(saveProjects){
-                res.status(200).send({msg: "Project is Updated Successfully"})
-            }else{
-                res.status(401).send({msg: "Error in updating Project"})
-            }
-        }
-    } catch (error) {
-        res.status(500).send({msg: error.msg})
+    const avatar_clod = await cloudinary.uploader.upload(
+      image.tempFilePath,
+      function (res) {},
+      {
+        folder: `TGIF/Project/${heading}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    const newProject = new Project({
+      image: avatar_clod.url,
+      heading,
+      desc,
+      goal,
+      raised,
+    });
+    const savedProject = await newProject.save();
+    if (savedProject) {
+      return res
+        .status(201)
+        .send({ msg: "Project Uploaded Successfully", savedProject });
+    } else {
+      return res.status(401).send({ error: "Error in saving Project" });
     }
-})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
 
-projectRouter.delete("/:id", async(req, res)=>{
-    try {
-        const projectId = req.params.id
-        const getProject = await Project.findById({_id:projectId})
-        if(getProject){
-            const deleteProject = await getProject.remove()
-            res.send({msg: "Project is Deleted"})
-        }else{
-            res.status(401).send({msg: "Error in deleting Project"})
-        }
-        
-    } catch (error) {
-        res.status(500).send({msg: error.msg})
+projectRouter.put("/:id", async (req, res) => {
+  try {
+    const { heading, goal, raised, desc } = req.body;
+    const image = req.files.image;
+    if (!heading || !image || !desc) {
+      return res.status(422).json({ error: "Fill all required fields" });
     }
-})
+    const getProject = await Project.findById(req.params.id);
+    if (!getProject) {
+      return res.status(422).json({ error: "Project doesnt exist" });
+    }
+    const avatar_clod = await cloudinary.uploader.upload(
+      image.tempFilePath,
+      function (res) {},
+      {
+        folder: `TGIF/Teams/${heading}`,
+        resource_type: "auto",
+        use_filename: true,
+      }
+    );
+    if (getProject) {
+      getProject.image = avatar_clod.url;
+      getProject.heading = heading;
+      getProject.desc = desc;
+      getProject.goal = goal;
+      getProject.raised = raised;
 
+      const saveProjects = await getProject.save();
+      if (saveProjects) {
+        return res
+          .status(200)
+          .send({ msg: "Project is Updated Successfully", saveProjects });
+      } else {
+        return res.status(401).send({ error: "Error in updating Project" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
+
+projectRouter.delete("/:id", async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const getProject = await Project.findById({ _id: projectId });
+    if (getProject) {
+      const deleteProject = await getProject.remove();
+      res.send({ msg: "Project is Deleted" });
+    } else {
+      res.status(401).send({ error: "Error in deleting Project" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "error" });
+  }
+});
 
 export default projectRouter;
