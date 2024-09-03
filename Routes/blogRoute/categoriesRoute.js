@@ -1,5 +1,5 @@
 const express = require("express");
-const Category = require("../../Model/BlogModel/Category");
+const Category = require("../../Model/BlogModel/Category.js");
 
 const categoryRoute = express.Router();
 

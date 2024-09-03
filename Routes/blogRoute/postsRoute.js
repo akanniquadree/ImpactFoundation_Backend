@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const Post = require("../../Model/BlogModel/Post");
+const Post = require("../../Model/BlogModel/Post.js");
 
 const postRouter = express.Router();
 

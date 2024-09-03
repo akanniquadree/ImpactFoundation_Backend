@@ -3,16 +3,16 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const fileupload = require("express-fileupload");
 const cors = require("cors");
-const Authrouter = require("./Routes/userRoute/auth");
-const userRouter = require("./Routes/userRoute/userRoute");
-const eventRouter = require("./Routes/eventRoute/eventRoute");
-const projectRouter = require("./Routes/projectRoute/projectRoute");
-const volunteeRouter = require("./Routes/volunteeRoute/volunteeRoute");
-const teamRoute = require("./Routes/teamRoute/team");
-const galleryRouter = require("./routes/galleryRoute/galleryRoute");
-const sponsorRouter = require("./Routes/sponsorRoute/sponsorRoute");
-const categoryRoute = require("./Routes/blogRoute/categoriesRoute");
-const postRouter = require("./Routes/blogRoute/postsRoute");
+const Authrouter = require("./Routes/userRoute/auth.js");
+const userRouter = require("./Routes/userRoute/userRoute.js");
+const eventRouter = require("./Routes/eventRoute/eventRoute.js");
+const projectRouter = require("./Routes/projectRoute/projectRoute.js");
+const volunteeRouter = require("./Routes/volunteeRoute/volunteeRoute.js");
+const teamRoute = require("./Routes/teamRoute/team.js");
+const galleryRouter = require("./routes/galleryRoute/galleryRoute.js");
+const sponsorRouter = require("./Routes/sponsorRoute/sponsorRoute.js");
+const categoryRoute = require("./Routes/blogRoute/categoriesRoute.js");
+const postRouter = require("./Routes/blogRoute/postsRoute.js");
 
 dotenv.config();
 
