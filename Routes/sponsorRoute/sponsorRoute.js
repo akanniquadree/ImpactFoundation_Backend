@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Sponsor = require("../../Model/SponsorModel/SponsorModel.js");
+const SponsorModel = require("../../Model/SponsorModel/SponsorModel.js");
 
 dotenv.config();
 cloudinary.config({
@@ -13,7 +13,7 @@ cloudinary.config({
 const sponsorRouter = express.Router();
 
 sponsorRouter.get("/", async (req, res) => {
-  const sponsor = await Sponsor.find({}).sort("-updateAt");
+  const sponsor = await SponsorModel.find({}).sort("-updateAt");
   res.status(200).send(sponsor);
 });
 
@@ -24,7 +24,7 @@ sponsorRouter.post("/", async (req, res) => {
     if (!name || !loc || !desc) {
       return res.status(422).json({ error: "Fill all required fields" });
     }
-    const existTeam = await Sponsor.findOne({ name });
+    const existTeam = await SponsorModel.findOne({ name });
     if (existTeam) {
       return res
         .status(422)
@@ -46,7 +46,7 @@ sponsorRouter.post("/", async (req, res) => {
       loc,
       desc,
     });
-    const newSponsor = await getSponsor.save();
+    const newSponsor = await getSponsorModel.save();
     if (newSponsor) {
       return res
         .status(201)
@@ -67,7 +67,7 @@ sponsorRouter.put("/:id", async (req, res) => {
       return res.status(422).json({ error: "Fill all required fields" });
     }
     const sponsorId = req.params.id;
-    const getSponsor = await Sponsor.findById({ _id: sponsorId });
+    const getSponsor = await SponsorModel.findById({ _id: sponsorId });
     if (!getSponsor) {
       return res.status(422).json({ error: "Sponsor Name doesnt exist" });
     }
@@ -81,12 +81,12 @@ sponsorRouter.put("/:id", async (req, res) => {
       }
     );
     if (getSponsor) {
-      getSponsor.name = name;
-      getSponsor.image = avatar_clod.url;
-      getSponsor.loc = loc;
-      getSponsor.desc = desc;
+      getSponsorModel.name = name;
+      getSponsorModel.image = avatar_clod.url;
+      getSponsorModel.loc = loc;
+      getSponsorModel.desc = desc;
 
-      const saveSponsor = await getSponsor.save();
+      const saveSponsor = await getSponsorModel.save();
       if (saveSponsor) {
         return res.status(201).send(saveSponsor);
       }
@@ -101,9 +101,9 @@ sponsorRouter.put("/:id", async (req, res) => {
 
 sponsorRouter.delete("/:id", async (req, res) => {
   try {
-    const getSponsor = await Sponsor.findById(req.body.id);
+    const getSponsor = await SponsorModel.findById(req.body.id);
     if (getSponsor) {
-      await getSponsor.remove();
+      await getSponsorModel.remove();
       return res.status(200).send({ msg: "Sponsor Deleted" });
     }
     return res.status(422).send({ msg: "Error in deleting Sponsor" });

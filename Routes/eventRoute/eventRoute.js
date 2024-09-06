@@ -1,20 +1,20 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Event = require("../../Model/EventModel/EventModel.js");
+const EventModel = require("../../Model/EventModel/EventModel.js");
 dotenv.config();
 
 const eventRouter = express.Router();
 
 eventRouter.get("/", async (req, res) => {
-  const event = await Event.find().sort("-updateAt");
+  const event = await EventModel.find().sort("-updateAt");
   res.send(event);
 });
 
 eventRouter.get("/:id", async (req, res) => {
   const EventId = req.params.id;
   try {
-    const getEvent = await Event.findById({ _id: EventId });
+    const getEvent = await EventModel.findById({ _id: EventId });
     if (getEvent) {
       res.send(getEvent);
     } else {
@@ -51,7 +51,7 @@ eventRouter.post("/", async (req, res) => {
     ) {
       return res.status(422).json({ error: "Fill all required fields" });
     }
-    const existEvent = await Event.findOne({ heading });
+    const existEvent = await EventModel.findOne({ heading });
     if (existEvent) {
       return res
         .status(422)
@@ -78,7 +78,7 @@ eventRouter.post("/", async (req, res) => {
       phone,
       stopTime,
     });
-    const saveEvent = await newEvent.save();
+    const saveEvent = await newEventModel.save();
     if (saveEvent) {
       res.status(200).send({ msg: "Event Successfully Created", saveEvent });
     } else {
@@ -116,7 +116,7 @@ eventRouter.put("/:id", async (req, res) => {
       return res.status(422).json({ error: "Fill all required fields" });
     }
     const EventId = req.params.id;
-    const getEvent = await Event.findById({ _id: EventId });
+    const getEvent = await EventModel.findById({ _id: EventId });
     if (!getEvent) {
       return res.status(422).json({ error: "Event doesnt exist" });
     }
@@ -130,15 +130,17 @@ eventRouter.put("/:id", async (req, res) => {
       }
     );
     if (getEvent) {
-      getEvent.image = avatar_clod.url;
-      getEvent.heading = heading;
-      getEvent.date = date;
-      (getEvent.loc = loc), (getEvent.text1 = text1), (getEvent.text2 = text2);
-      (getEvent.starTime = starTime),
-        (getEvent.stopTime = stopTime),
-        (getEvent.phone = phone);
-      getEvent.require = require;
-      const updatedEvent = await getEvent.save();
+      getEventModel.image = avatar_clod.url;
+      getEventModel.heading = heading;
+      getEventModel.date = date;
+      (getEventModel.loc = loc),
+        (getEventModel.text1 = text1),
+        (getEventModel.text2 = text2);
+      (getEventModel.starTime = starTime),
+        (getEventModel.stopTime = stopTime),
+        (getEventModel.phone = phone);
+      getEventModel.require = require;
+      const updatedEvent = await getEventModel.save();
       if (updatedEvent) {
         return res
           .status(201)
@@ -154,9 +156,9 @@ eventRouter.put("/:id", async (req, res) => {
 
 eventRouter.delete("/:id", async (req, res) => {
   try {
-    const getEvent = await Event.findById(req.params.id);
+    const getEvent = await EventModel.findById(req.params.id);
     if (getEvent) {
-      await getEvent.remove();
+      await getEventModel.remove();
       res.send("Event Successfully Deleted");
     } else {
       res.status(401).send({ msg: "Error in deleting Event" });

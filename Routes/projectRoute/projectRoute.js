@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Project = require("../../Model/ProjectModel/ProjectModel.js");
+const ProjectModel = require("../../Model/ProjectModel/ProjectModel.js");
 
 const projectRouter = express.Router();
 dotenv.config();
@@ -13,14 +13,14 @@ cloudinary.config({
 });
 
 projectRouter.get("/", async (req, res) => {
-  const projects = await Project.find({}).sort("-updateAt");
+  const projects = await ProjectModel.find({}).sort("-updateAt");
   return res.status(201).res.send(projects);
 });
 
 projectRouter.get("/:id", async (req, res) => {
   const projectId = req.params.id;
   try {
-    const project = await Project.findById({ _id: projectId });
+    const project = await ProjectModel.findById({ _id: projectId });
     if (project) {
       return res.status(201).send(project);
     } else {
@@ -39,7 +39,7 @@ projectRouter.post("/", async (req, res) => {
     if (!heading || !image || !desc) {
       return res.status(422).json({ error: "Fill all required fields" });
     }
-    const existTeam = await Project.findOne({ heading });
+    const existTeam = await ProjectModel.findOne({ heading });
     if (existTeam) {
       return res
         .status(422)
@@ -61,7 +61,7 @@ projectRouter.post("/", async (req, res) => {
       goal,
       raised,
     });
-    const savedProject = await newProject.save();
+    const savedProject = await newProjectModel.save();
     if (savedProject) {
       return res
         .status(201)
@@ -82,7 +82,7 @@ projectRouter.put("/:id", async (req, res) => {
     if (!heading || !image || !desc) {
       return res.status(422).json({ error: "Fill all required fields" });
     }
-    const getProject = await Project.findById(req.params.id);
+    const getProject = await ProjectModel.findById(req.params.id);
     if (!getProject) {
       return res.status(422).json({ error: "Project doesnt exist" });
     }
@@ -96,13 +96,13 @@ projectRouter.put("/:id", async (req, res) => {
       }
     );
     if (getProject) {
-      getProject.image = avatar_clod.url;
-      getProject.heading = heading;
-      getProject.desc = desc;
-      getProject.goal = goal;
-      getProject.raised = raised;
+      getProjectModel.image = avatar_clod.url;
+      getProjectModel.heading = heading;
+      getProjectModel.desc = desc;
+      getProjectModel.goal = goal;
+      getProjectModel.raised = raised;
 
-      const saveProjects = await getProject.save();
+      const saveProjects = await getProjectModel.save();
       if (saveProjects) {
         return res
           .status(200)
@@ -120,9 +120,9 @@ projectRouter.put("/:id", async (req, res) => {
 projectRouter.delete("/:id", async (req, res) => {
   try {
     const projectId = req.params.id;
-    const getProject = await Project.findById({ _id: projectId });
+    const getProject = await ProjectModel.findById({ _id: projectId });
     if (getProject) {
-      const deleteProject = await getProject.remove();
+      const deleteProject = await getProjectModel.remove();
       res.send({ msg: "Project is Deleted" });
     } else {
       res.status(401).send({ error: "Error in deleting Project" });

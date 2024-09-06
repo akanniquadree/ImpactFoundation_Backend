@@ -9,6 +9,6 @@ const teamSchema = new mongoose.Schema({
   instagram: { type: String, required: false },
 });
 
-const Team = mongoose.model("Team", teamSchema);
+const TeamModel = mongoose.model("Team", teamSchema);
 
-module.exports = Team;
+module.exports = TeamModel;

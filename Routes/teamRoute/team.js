@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Team = require("../../Model/TeamModel/TeamModel.js");
+const TeamModel = require("../../Model/TeamModel/TeamModel.js");
 
 const teamRoute = express.Router();
 dotenv.config();
@@ -13,12 +13,12 @@ cloudinary.config({
 });
 
 teamRoute.get("/", async (req, res) => {
-  const teams = await Team.find({}).sort("-updateAt");
+  const teams = await TeamModel.find({}).sort("-updateAt");
   return res.status(201).json(teams);
 });
 
 teamRoute.get("/:id", async (req, res) => {
-  const team = await Team.findById(req.body.id);
+  const team = await TeamModel.findById(req.body.id);
   if (!team) {
     return res.status(401).json({ error: "Error in retrieving Team" });
   }
@@ -32,7 +32,7 @@ teamRoute.post("/", async (req, res) => {
     if (!name || !post) {
       return res.status(422).json({ error: "Fill all required fields" });
     }
-    const existTeam = await Team.findOne({ name });
+    const existTeam = await TeamModel.findOne({ name });
     if (existTeam) {
       return res
         .status(422)
@@ -55,7 +55,7 @@ teamRoute.post("/", async (req, res) => {
       twitter,
       instagram,
     });
-    const saveTeam = await team.save();
+    const saveTeam = await teamModelTeamModel.save();
     if (saveTeam) {
       return res
         .status(201)
@@ -76,7 +76,7 @@ teamRoute.put("/:id", async (req, res) => {
       return res.status(422).json({ error: "Fill all required fields" });
     }
     const TeamId = req.params.id;
-    const getTeam = await Team.findById({ _id: TeamId });
+    const getTeam = await TeamModel.findById({ _id: TeamId });
     if (!getTeam) {
       return res.status(422).json({ error: "Team member doesnt exist" });
     }
@@ -90,13 +90,13 @@ teamRoute.put("/:id", async (req, res) => {
       }
     );
     if (getTeam) {
-      getTeam.articleImage = avatar_clod.url;
-      getTeam.name = name;
-      getTeam.post = post;
-      (getTeam.facebook = facebook),
-        (getTeam.twitter = twitter),
-        (getTeam.instagram = instagram);
-      const updatedTeam = await getTeam.save();
+      getTeamModel.articleImage = avatar_clod.url;
+      getTeamModel.name = name;
+      getTeamModel.post = post;
+      (getTeamModel.facebook = facebook),
+        (getTeamModel.twitter = twitter),
+        (getTeamModel.instagram = instagram);
+      const updatedTeam = await getTeamModel.save();
       if (updatedTeam) {
         return res
           .status(201)
@@ -111,9 +111,9 @@ teamRoute.put("/:id", async (req, res) => {
 });
 
 teamRoute.delete("/:id", async (req, res) => {
-  const deleteTeam = await Team.findById(req.params.id);
+  const deleteTeam = await TeamModel.findById(req.params.id);
   if (deleteTeam) {
-    await deleteTeam.remove();
+    await deleteTeamModel.remove();
     return res.send({ message: "Product Deleted" });
   }
   return res.status(400).send({ message: "Error in deleting Team member" });

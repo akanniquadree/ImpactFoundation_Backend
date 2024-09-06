@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const Gallery = require("../../Model/GalleryModel/GalleryModel.js");
+const GalleryModel = require("../../Model/GalleryModel/GalleryModel.js");
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ cloudinary.config({
 const galleryRouter = express.Router();
 
 galleryRouter.get("/", async (req, res) => {
-  const gallerys = await Gallery.find({}).sort({ createdAt: "desc" });
+  const gallerys = await GalleryModel.find({}).sort({ createdAt: "desc" });
   res.send(gallerys);
 });
 
