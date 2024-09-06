@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const GalleryModel = require("../../Model/GalleryModel.js");
+const GalleryModel = require("../Model/GalleryModel.js");
 
 dotenv.config();
 

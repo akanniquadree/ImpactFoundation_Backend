@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const TeamModel = require("../../Model/TeamModel.js");
+const TeamModel = require("../Model/TeamModel");
 
 const teamRoute = express.Router();
 dotenv.config();
