@@ -14,7 +14,7 @@ cloudinary.config({
 
 projectRouter.get("/", async (req, res) => {
   const projects = await ProjectModel.find({}).sort("-updateAt");
-  return res.status(201).res.send(projects);
+  return res.status(201).send(projects);
 });
 
 projectRouter.get("/:id", async (req, res) => {
