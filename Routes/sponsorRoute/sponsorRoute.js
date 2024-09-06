@@ -1,7 +1,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary");
 const dotenv = require("dotenv");
-const SponsorModel = require("../../Model/SponsorModel/SponsorModel.js");
+const SponsorModel = require("../../Model/SponsorModel/SponsorModel");
 
 dotenv.config();
 cloudinary.config({
