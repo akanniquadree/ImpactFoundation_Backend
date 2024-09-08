@@ -6,7 +6,8 @@ const projectSchema = new mongoose.Schema(
     heading: { type: String, required: true },
     desc: { type: String, required: true },
     goal: { type: Number, required: false },
-    raised: { type: Number, required: false },
+    loc: { type: Number, required: false },
+    desc1: { type: Number, required: false },
   },
   { timestamps: true }
 );

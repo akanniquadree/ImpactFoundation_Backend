@@ -34,7 +34,7 @@ projectRouter.get("/:id", async (req, res) => {
 
 projectRouter.post("/", async (req, res) => {
   try {
-    const { heading, goal, raised, desc } = req.body;
+    const { heading, goal, raised, desc, loc, desc1 } = req.body;
     const image = req.files.image;
     if (!heading || !image || !desc) {
       return res.status(422).json({ error: "Fill all required fields" });
@@ -60,8 +60,10 @@ projectRouter.post("/", async (req, res) => {
       desc,
       goal,
       raised,
+      loc,
+      desc1,
     });
-    const savedProject = await newProjectModel.save();
+    const savedProject = await newProject.save();
     if (savedProject) {
       return res
         .status(201)
@@ -77,7 +79,7 @@ projectRouter.post("/", async (req, res) => {
 
 projectRouter.put("/:id", async (req, res) => {
   try {
-    const { heading, goal, raised, desc } = req.body;
+    const { heading, goal, raised, desc, loc, desc1 } = req.body;
     const image = req.files.image;
     if (!heading || !image || !desc) {
       return res.status(422).json({ error: "Fill all required fields" });
@@ -96,13 +98,15 @@ projectRouter.put("/:id", async (req, res) => {
       }
     );
     if (getProject) {
-      getProjectModel.image = avatar_clod.url;
-      getProjectModel.heading = heading;
-      getProjectModel.desc = desc;
-      getProjectModel.goal = goal;
-      getProjectModel.raised = raised;
+      getProject.image = avatar_clod.url;
+      getProject.heading = heading;
+      getProject.desc = desc;
+      getProject.goal = goal;
+      getProject.raised = raised;
+      getProject.loc = loc;
+      getProject.desc1 = desc1;
 
-      const saveProjects = await getProjectModel.save();
+      const saveProjects = await getProject.save();
       if (saveProjects) {
         return res
           .status(200)
@@ -122,7 +126,7 @@ projectRouter.delete("/:id", async (req, res) => {
     const projectId = req.params.id;
     const getProject = await ProjectModel.findById({ _id: projectId });
     if (getProject) {
-      const deleteProject = await getProjectModel.remove();
+      const deleteProject = await getProject.remove();
       res.send({ msg: "Project is Deleted" });
     } else {
       res.status(401).send({ error: "Error in deleting Project" });
