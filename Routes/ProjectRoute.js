@@ -54,7 +54,7 @@ projectRouter.post("/", async (req, res) => {
         use_filename: true,
       }
     );
-    const newProject = new Project({
+    const newProject = new ProjectModel({
       image: avatar_clod.url,
       heading,
       desc,
