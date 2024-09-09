@@ -66,7 +66,7 @@ eventRouter.post("/", async (req, res) => {
         use_filename: true,
       }
     );
-    const newEvent = new Event({
+    const newEvent = new EventModel({
       image: avatar_clod.url,
       heading,
       date,
