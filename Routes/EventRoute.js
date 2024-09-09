@@ -78,7 +78,7 @@ eventRouter.post("/", async (req, res) => {
       phone,
       stopTime,
     });
-    const saveEvent = await newEventModel.save();
+    const saveEvent = await newEvent.save();
     if (saveEvent) {
       res.status(200).send({ msg: "Event Successfully Created", saveEvent });
     } else {
@@ -130,17 +130,15 @@ eventRouter.put("/:id", async (req, res) => {
       }
     );
     if (getEvent) {
-      getEventModel.image = avatar_clod.url;
-      getEventModel.heading = heading;
-      getEventModel.date = date;
-      (getEventModel.loc = loc),
-        (getEventModel.text1 = text1),
-        (getEventModel.text2 = text2);
-      (getEventModel.starTime = starTime),
-        (getEventModel.stopTime = stopTime),
-        (getEventModel.phone = phone);
-      getEventModel.require = require;
-      const updatedEvent = await getEventModel.save();
+      getEvent.image = avatar_clod.url;
+      getEvent.heading = heading;
+      getEvent.date = date;
+      (getEvent.loc = loc), (getEvent.text1 = text1), (getEvent.text2 = text2);
+      (getEvent.starTime = starTime),
+        (getEvent.stopTime = stopTime),
+        (getEvent.phone = phone);
+      getEvent.require = require;
+      const updatedEvent = await getEvent.save();
       if (updatedEvent) {
         return res
           .status(201)
@@ -158,7 +156,7 @@ eventRouter.delete("/:id", async (req, res) => {
   try {
     const getEvent = await EventModel.findById(req.params.id);
     if (getEvent) {
-      await getEventModel.remove();
+      await getEvent.remove();
       res.send("Event Successfully Deleted");
     } else {
       res.status(401).send({ msg: "Error in deleting Event" });
